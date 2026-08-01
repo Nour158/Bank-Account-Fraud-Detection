@@ -17,11 +17,13 @@ st.set_page_config(
 # ==========================
 
 from pathlib import Path
+import joblib
 
 BASE_DIR = Path(__file__).resolve().parent
+MODEL_DIR = BASE_DIR / "models"
 
-model = joblib.load(BASE_DIR / "best_xgb_model.pkl")
-label_encoders = joblib.load(BASE_DIR / "label_encoders.pkl")
+model = joblib.load(MODEL_DIR / "best_xgb_model.pkl")
+label_encoders = joblib.load(MODEL_DIR / "label_encoders.pkl")
 
 # ==========================
 # Sidebar
