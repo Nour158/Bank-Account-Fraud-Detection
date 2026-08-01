@@ -10,6 +10,7 @@ The project explores data preprocessing, feature engineering, class imbalance, m
  **Try the application here:**
 
 **https://bank-account-fraud-detection-q4jcnzi5hph4pxit5uzdee.streamlit.app**
+
 The project includes a Streamlit web application where users can enter customer information and receive a fraud-risk prediction.
 
 The application provides:
