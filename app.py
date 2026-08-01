@@ -193,6 +193,31 @@ st.markdown(
         background: #173f7d;
         color: white;
     }
+
+    /* Make every input title clearly visible on the light background */
+    [data-testid="stWidgetLabel"],
+    [data-testid="stWidgetLabel"] p,
+    .stSlider label,
+    .stSelectbox label,
+    .stCheckbox label,
+    .stNumberInput label,
+    .stTextInput label {
+        color: #162033 !important;
+        font-weight: 750 !important;
+        opacity: 1 !important;
+    }
+
+    /* Keep helper text readable */
+    [data-testid="stCaptionContainer"],
+    .stCaption {
+        color: #5f6f86 !important;
+    }
+
+    /* Improve dropdown/input contrast */
+    [data-baseweb="select"] > div,
+    [data-testid="stNumberInputContainer"] input {
+        border-color: #cfd8e6 !important;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -253,6 +278,10 @@ form_col, result_col = st.columns([1.65, 1], gap="large")
 
 with form_col:
     st.subheader("Applicant Information")
+    st.caption(
+        "Fields ending in ‘Code’ use the original category codes from the NeurIPS dataset. "
+        "The model was trained with these exact coded values."
+    )
 
     with st.form("fraud_form"):
 
@@ -270,23 +299,27 @@ with form_col:
                 max_value=0.9,
                 value=0.6,
                 step=0.1,
+                help="Normalized income value used by the dataset (0.1 = lower, 0.9 = higher).",
             )
 
             customer_age = st.selectbox(
                 "Customer Age",
                 [10, 20, 30, 40, 50, 60, 70, 80, 90],
                 index=3,
+                help="Applicant age group in years.",
             )
 
             employment_status = st.selectbox(
-                "Employment Status",
+                "Employment Status Code",
                 ["CA", "CB", "CC", "CD", "CE", "CF", "CG"],
+                help="Select the same employment-status code used in the NeurIPS dataset.",
             )
 
         with c2:
             housing_status = st.selectbox(
-                "Housing Status",
+                "Housing Status Code",
                 ["BA", "BB", "BC", "BD", "BE", "BF", "BG"],
+                help="Select the housing-status code used in the training dataset.",
             )
 
             name_email_similarity = st.slider(
@@ -294,11 +327,13 @@ with form_col:
                 min_value=0.0,
                 max_value=1.0,
                 value=0.5,
+                help="Similarity score between the applicant's name and email address.",
             )
 
             payment_type = st.selectbox(
-                "Payment Type",
+                "Payment Type Code",
                 ["AA", "AB", "AC", "AD", "AE"],
+                help="Select the payment-type code used in the training dataset.",
             )
 
         st.markdown(
@@ -314,6 +349,7 @@ with form_col:
                 min_value=-1,
                 max_value=428,
                 value=52,
+                help="Number of months at the current address. -1 means unavailable.",
             )
 
         with a2:
@@ -322,6 +358,7 @@ with form_col:
                 min_value=-1,
                 max_value=383,
                 value=-1,
+                help="Number of months at the previous address. -1 means unavailable.",
             )
 
         st.markdown(
@@ -337,12 +374,14 @@ with form_col:
                 min_value=-170,
                 max_value=389,
                 value=122,
+                help="Credit risk score recorded for the application.",
             )
 
         with f2:
             proposed_credit_limit = st.selectbox(
                 "Proposed Credit Limit",
                 [200, 500, 1000, 1500, 2000],
+                help="Requested or proposed credit limit.",
             )
 
         st.markdown(
@@ -356,6 +395,7 @@ with form_col:
             device_os = st.selectbox(
                 "Device Operating System",
                 ["linux", "windows", "macintosh", "x11", "other"],
+                help="Operating system used to submit the application.",
             )
 
         with d2:
@@ -364,6 +404,7 @@ with form_col:
                 min_value=0.0,
                 max_value=86.0,
                 value=5.0,
+                help="Length of the online application session in minutes.",
             )
 
         st.markdown(
