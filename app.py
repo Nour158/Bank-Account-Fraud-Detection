@@ -178,20 +178,46 @@ st.markdown(
         margin-bottom: 0.5rem;
     }
 
+    /* Normal buttons and form-submit buttons */
+    div[data-testid="stButton"] button,
+    div[data-testid="stFormSubmitButton"] button,
     .stButton > button {
-        width: 100%;
-        min-height: 3.1rem;
-        border-radius: 12px;
-        border: none;
-        background: #1f4f9a;
-        color: white;
-        font-weight: 750;
-        font-size: 1rem;
+        width: 100% !important;
+        min-height: 3.1rem !important;
+        border-radius: 12px !important;
+        border: 1px solid #1f4f9a !important;
+        background: #1f4f9a !important;
+        color: #ffffff !important;
+        font-weight: 750 !important;
+        font-size: 1rem !important;
+        box-shadow: none !important;
     }
 
+    /* Streamlit places the button text inside child elements */
+    div[data-testid="stButton"] button *,
+    div[data-testid="stFormSubmitButton"] button *,
+    .stButton > button * {
+        color: #ffffff !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    div[data-testid="stButton"] button:hover,
+    div[data-testid="stFormSubmitButton"] button:hover,
     .stButton > button:hover {
-        background: #173f7d;
-        color: white;
+        background: #173f7d !important;
+        border-color: #173f7d !important;
+        color: #ffffff !important;
+    }
+
+    div[data-testid="stButton"] button:focus,
+    div[data-testid="stFormSubmitButton"] button:focus,
+    div[data-testid="stButton"] button:active,
+    div[data-testid="stFormSubmitButton"] button:active {
+        background: #173f7d !important;
+        border-color: #173f7d !important;
+        color: #ffffff !important;
+        outline: 3px solid rgba(31, 79, 154, 0.20) !important;
     }
 
     /* Make every input title clearly visible on the light background */
