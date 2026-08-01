@@ -1,4 +1,4 @@
-from pathlib import Path
+rom pathlib import Path
 
 import joblib
 import pandas as pd
@@ -13,12 +13,12 @@ st.set_page_config(
     page_title="FraudGuard AI",
     page_icon="🛡️",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 
 # =========================================================
-# Paths and artifact loading
+# Paths and model loading
 # =========================================================
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -26,9 +26,6 @@ MODEL_DIR = BASE_DIR / "models"
 
 
 def find_artifact(filename: str) -> Path:
-    """
-    Search for an artifact beside app.py and inside models/.
-    """
     candidates = [
         BASE_DIR / filename,
         MODEL_DIR / filename,
@@ -38,22 +35,16 @@ def find_artifact(filename: str) -> Path:
         if candidate.exists():
             return candidate
 
-    checked = "\n".join(f"- {path}" for path in candidates)
-
     raise FileNotFoundError(
-        f"Could not find '{filename}'. Checked:\n{checked}"
+        f"Could not find '{filename}' beside app.py or inside models/."
     )
 
 
 @st.cache_resource
 def load_artifacts():
-    model_path = find_artifact("best_xgb_model.pkl")
-    encoders_path = find_artifact("label_encoders.pkl")
-
-    loaded_model = joblib.load(model_path)
-    loaded_encoders = joblib.load(encoders_path)
-
-    return loaded_model, loaded_encoders
+    model = joblib.load(find_artifact("best_xgb_model.pkl"))
+    encoders = joblib.load(find_artifact("label_encoders.pkl"))
+    return model, encoders
 
 
 try:
@@ -61,16 +52,6 @@ try:
 except Exception as error:
     st.error("The trained model files could not be loaded.")
     st.code(str(error))
-    st.markdown(
-        """
-Place these files either beside `app.py` or inside a `models` folder:
-
-```text
-best_xgb_model.pkl
-label_encoders.pkl
-```
-"""
-    )
     st.stop()
 
 
@@ -82,62 +63,84 @@ st.markdown(
     """
     <style>
     .stApp {
-        background: #f4f7fb;
-        color: #172033;
+        background: #f5f7fb;
+        color: #162033;
     }
 
     .block-container {
-        max-width: 1450px;
-        padding-top: 1.25rem;
+        max-width: 1500px;
+        padding-top: 1.2rem;
         padding-bottom: 2rem;
     }
 
-    [data-testid="stSidebar"] {
-        background: #102344;
-        color: white;
-    }
-
-    [data-testid="stSidebar"] * {
-        color: white;
-    }
-
     .hero {
-        background: linear-gradient(135deg, #ffffff, #edf3ff);
-        border: 1px solid #dce4f0;
-        border-radius: 22px;
-        padding: 1.5rem 1.7rem;
-        box-shadow: 0 12px 35px rgba(35, 58, 98, 0.08);
+        background: linear-gradient(135deg, #112b52, #1e4c8f);
+        color: white;
+        border-radius: 24px;
+        padding: 1.6rem 1.8rem;
+        box-shadow: 0 16px 40px rgba(20, 48, 94, 0.18);
         margin-bottom: 1rem;
     }
 
     .hero-title {
-        font-size: 2.45rem;
+        font-size: 2.5rem;
         font-weight: 850;
-        color: #193564;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.25rem;
     }
 
     .hero-subtitle {
-        color: #65748d;
+        color: #d9e6fa;
         font-size: 1rem;
     }
 
-    .section-card {
+    .info-card {
+        background: white;
+        border: 1px solid #e1e7f0;
+        border-radius: 18px;
+        padding: 1rem 1.1rem;
+        box-shadow: 0 8px 24px rgba(28, 52, 95, 0.06);
+        height: 100%;
+    }
+
+    .info-title {
+        color: #6b7890;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 750;
+    }
+
+    .info-value {
+        color: #17325f;
+        font-size: 1.45rem;
+        font-weight: 800;
+        margin-top: 0.25rem;
+    }
+
+    .category-card {
         background: white;
         border: 1px solid #e1e7f0;
         border-radius: 20px;
-        padding: 1.15rem 1.2rem;
-        box-shadow: 0 10px 28px rgba(23, 50, 95, 0.06);
+        padding: 1rem 1.15rem;
         margin-bottom: 1rem;
+        box-shadow: 0 8px 24px rgba(28, 52, 95, 0.05);
     }
 
-    .section-label {
-        font-size: 0.82rem;
-        font-weight: 750;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #66748b;
-        margin-bottom: 0.5rem;
+    .category-title {
+        color: #193564;
+        font-size: 1.1rem;
+        font-weight: 800;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.45rem;
+        border-bottom: 2px solid #e7edf6;
+    }
+
+    .waiting-card {
+        background: white;
+        border: 1px solid #e1e7f0;
+        border-radius: 20px;
+        padding: 1.4rem;
+        box-shadow: 0 10px 28px rgba(23, 50, 95, 0.06);
     }
 
     .risk-card {
@@ -162,30 +165,17 @@ st.markdown(
     }
 
     .risk-score {
-        font-size: 3.35rem;
+        font-size: 3.3rem;
         font-weight: 850;
         line-height: 1;
         color: #17325f;
-        margin: 0.45rem 0 0.75rem;
+        margin: 0.4rem 0 0.75rem;
     }
 
     .risk-title {
-        font-size: 1.65rem;
+        font-size: 1.55rem;
         font-weight: 800;
-        margin-bottom: 0.45rem;
-    }
-
-    .risk-action {
-        color: #40506a;
-        font-size: 1rem;
-    }
-
-    .waiting-card {
-        background: white;
-        border: 1px solid #e1e7f0;
-        border-radius: 20px;
-        padding: 1.4rem;
-        box-shadow: 0 10px 28px rgba(23, 50, 95, 0.06);
+        margin-bottom: 0.5rem;
     }
 
     .stButton > button {
@@ -210,31 +200,7 @@ st.markdown(
 
 
 # =========================================================
-# Sidebar
-# =========================================================
-
-with st.sidebar:
-    st.title("🏦 Fraud Detection")
-
-    st.markdown("### Model")
-    st.write("XGBoost Classifier")
-
-    st.markdown("### Dataset")
-    st.write("NeurIPS 2022 Bank Account Fraud Dataset")
-
-    st.markdown("### Performance")
-    st.metric("ROC-AUC", "0.893")
-    st.metric("Recall", "78.9%")
-    st.metric("Accuracy", "83.7%")
-
-    st.divider()
-
-    st.markdown("### Author")
-    st.write("Nourallah Ghonim")
-
-
-# =========================================================
-# Header and KPI cards
+# Header
 # =========================================================
 
 st.markdown(
@@ -242,32 +208,56 @@ st.markdown(
     <div class="hero">
         <div class="hero-title">🛡️ FraudGuard AI</div>
         <div class="hero-subtitle">
-            Professional bank-account application risk assessment powered by XGBoost.
+            Bank-account application risk assessment powered by an XGBoost classifier.
         </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-m1, m2, m3, m4 = st.columns(4)
-m1.metric("Model", "XGBoost")
-m2.metric("ROC-AUC", "0.893")
-m3.metric("Recall", "78.9%")
-m4.metric("Dataset Size", "1M applications")
+
+# =========================================================
+# Top information row
+# =========================================================
+
+i1, i2, i3, i4, i5 = st.columns(5)
+
+info_items = [
+    ("Model", "XGBoost"),
+    ("Dataset", "NeurIPS 2022"),
+    ("ROC-AUC", "0.893"),
+    ("Recall", "78.9%"),
+    ("Accuracy", "83.7%"),
+]
+
+for column, (title, value) in zip([i1, i2, i3, i4, i5], info_items):
+    with column:
+        st.markdown(
+            f"""
+            <div class="info-card">
+                <div class="info-title">{title}</div>
+                <div class="info-value">{value}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+st.write("")
 
 
 # =========================================================
 # Main layout
 # =========================================================
 
-form_col, result_col = st.columns([1.55, 1], gap="large")
+form_col, result_col = st.columns([1.65, 1], gap="large")
 
 with form_col:
     st.subheader("Applicant Information")
 
-    with st.form("fraud_assessment_form"):
+    with st.form("fraud_form"):
+
         st.markdown(
-            '<div class="section-label">👤 Customer Information</div>',
+            '<div class="category-title">👤 Customer Profile</div>',
             unsafe_allow_html=True,
         )
 
@@ -312,7 +302,7 @@ with form_col:
             )
 
         st.markdown(
-            '<div class="section-label">📍 Address Information</div>',
+            '<div class="category-title">📍 Address History</div>',
             unsafe_allow_html=True,
         )
 
@@ -335,7 +325,7 @@ with form_col:
             )
 
         st.markdown(
-            '<div class="section-label">💳 Financial Information</div>',
+            '<div class="category-title">💳 Financial Details</div>',
             unsafe_allow_html=True,
         )
 
@@ -356,7 +346,7 @@ with form_col:
             )
 
         st.markdown(
-            '<div class="section-label">💻 Device Information</div>',
+            '<div class="category-title">💻 Device and Session</div>',
             unsafe_allow_html=True,
         )
 
@@ -377,13 +367,13 @@ with form_col:
             )
 
         st.markdown(
-            '<div class="section-label">⚙️ Additional Checks</div>',
+            '<div class="category-title">⚙️ Verification Signals</div>',
             unsafe_allow_html=True,
         )
 
-        b1, b2 = st.columns(2)
+        v1, v2 = st.columns(2)
 
-        with b1:
+        with v1:
             phone_home_valid = st.checkbox(
                 "Home Phone Valid",
                 value=False,
@@ -394,7 +384,7 @@ with form_col:
                 value=True,
             )
 
-        with b2:
+        with v2:
             keep_alive_session = st.checkbox(
                 "Keep Alive Session",
                 value=True,
@@ -450,7 +440,7 @@ input_data = pd.DataFrame(
 
 
 # =========================================================
-# Risk result panel
+# Result panel
 # =========================================================
 
 with result_col:
@@ -475,7 +465,7 @@ with result_col:
         st.markdown(
             """
             <div class="waiting-card">
-                <h4>Risk thresholds</h4>
+                <h4>Risk Thresholds</h4>
                 <p><b>Low risk:</b> below 50%</p>
                 <p><b>Medium risk:</b> 50% to 79.99%</p>
                 <p><b>High risk:</b> 80% or above</p>
@@ -497,17 +487,12 @@ with result_col:
 
         try:
             for column in categorical_columns:
-                if column not in label_encoders:
-                    raise KeyError(
-                        f"Encoder for '{column}' is missing."
-                    )
-
                 encoder = label_encoders[column]
-                raw_value = encoded_input.at[0, column]
+                value = encoded_input.at[0, column]
 
-                if raw_value not in encoder.classes_:
+                if value not in encoder.classes_:
                     raise ValueError(
-                        f"Unknown value '{raw_value}' for '{column}'."
+                        f"Unknown value '{value}' for '{column}'."
                     )
 
                 encoded_input[column] = encoder.transform(
@@ -515,35 +500,21 @@ with result_col:
                 )
 
             if hasattr(model, "feature_names_in_"):
-                expected_columns = list(model.feature_names_in_)
-
-                missing_columns = [
-                    column
-                    for column in expected_columns
-                    if column not in encoded_input.columns
+                encoded_input = encoded_input[
+                    list(model.feature_names_in_)
                 ]
-
-                if missing_columns:
-                    raise ValueError(
-                        "Missing model input columns: "
-                        + ", ".join(missing_columns)
-                    )
-
-                encoded_input = encoded_input[expected_columns]
 
             probability = float(
                 model.predict_proba(encoded_input)[0][1]
             )
-
-            percentage = probability * 100
 
             if probability >= 0.80:
                 css_class = "risk-high"
                 icon = "🔴"
                 label = "HIGH RISK"
                 action = (
-                    "Temporarily block the application, verify the applicant's "
-                    "identity, and send it for manual review."
+                    "Temporarily block the application, verify identity, "
+                    "and perform a manual review."
                 )
 
             elif probability >= 0.50:
@@ -551,7 +522,7 @@ with result_col:
                 icon = "🟠"
                 label = "MEDIUM RISK"
                 action = (
-                    "Request additional customer verification before approval."
+                    "Request additional applicant verification before approval."
                 )
 
             else:
@@ -566,10 +537,10 @@ with result_col:
             st.markdown(
                 f"""
                 <div class="risk-card {css_class}">
-                    <div class="section-label">Fraud Probability</div>
-                    <div class="risk-score">{percentage:.2f}%</div>
+                    <div>Fraud Probability</div>
+                    <div class="risk-score">{probability * 100:.2f}%</div>
                     <div class="risk-title">{icon} {label}</div>
-                    <div class="risk-action">{action}</div>
+                    <p>{action}</p>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -578,20 +549,11 @@ with result_col:
             st.write("")
             st.progress(min(max(probability, 0.0), 1.0))
 
-            st.markdown("### 🛡️ Recommended Action")
+            st.markdown("### Recommended Action")
             st.write(action)
 
-            with st.expander("Review encoded application"):
-                st.dataframe(
-                    encoded_input,
-                    use_container_width=True,
-                )
-
             with st.expander("View raw application input"):
-                st.dataframe(
-                    input_data,
-                    use_container_width=True,
-                )
+                st.dataframe(input_data, use_container_width=True)
 
         except Exception as error:
             st.error("Prediction failed.")
@@ -599,26 +561,26 @@ with result_col:
 
 
 # =========================================================
-# About section
+# Footer
 # =========================================================
 
 st.divider()
 
-with st.expander("About this Project"):
+with st.expander("Project Details"):
     st.markdown(
         """
-### Project Workflow
+### Workflow
 
 - Exploratory Data Analysis
 - Feature Engineering
-- Handling Class Imbalance
+- Class-Imbalance Handling
 - Logistic Regression
 - Random Forest
 - Random Forest with SMOTE
 - Hyperparameter Tuning
 - XGBoost Final Model
 
-### Final Model Performance
+### Final Performance
 
 - Accuracy: **83.7%**
 - Recall: **78.9%**
@@ -626,6 +588,4 @@ with st.expander("About this Project"):
 """
     )
 
-st.caption(
-    "© 2026 Nourallah Ghonim | FraudGuard AI"
-)
+st.caption("© 2026 Nourallah Ghonim | FraudGuard AI")
